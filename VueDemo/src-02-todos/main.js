@@ -1,11 +1,11 @@
+/*
+   入口JS
+*/
 import Vue from 'vue'
-import VueResource from 'vue-resource'
-
 import App from './App.vue'
+import './index.css'
 
-
-Vue.use(VueResource)
-new Vue({
+new Vue ({
   el: '#app',
   components: {
     App

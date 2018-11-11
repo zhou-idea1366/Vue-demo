@@ -1,86 +1,73 @@
 <template>
-    <div class="todo-container">
-      <div class="todo-wrap">
-        <TodoHeader :addTodo="addTodo"/>
-        <TodoMain :todos="todos" :deleteTodo="deleteTodo"/>
-        <TodoFooter :todos="todos"
-                    :deleteCompleteTodos="deleteCompleteTodos"
-                    :selectAllTodos="selectAllTodos"/>
-
-      </div>
-    </div>
+  <div >
+    <h2 v-if="!repoName">LOADING.....</h2>
+    <p v-else>Most star repo is
+      <a :href="repoUrl">{{repoName}}</a>
+    </p>
+  </div>
 </template>
 
 <script>
-  import Header from './components/Header.vue'
-  import Footer from './components/Footer.vue'
-  import Main from './components/Main.vue'
-  import storageUtils from './utils/storageUtils'
-
+  import axios from 'axios'
 
   export default {
     data () {
       return {
-        todos: storageUtils.readTodos()
-//        todos: JSON.parse(localStorage.getItem('todos_key') || '[]')
-        /*[
-          {title:'吃飯', complete:false},
-          {title:'睡覺', complete:false},
-          {title:'打代碼', complete:false},
-
-        ]*/
-
+        repoName:'',
+        repoUrl:''
       }
     },
-    methods: {
-      //添加
-      addTodo (todo) {
-        this.todos.unshift(todo)
-      },
-      //删除
-      deleteTodo (index) {
-        this.todos.splice(index, 1)
-      },
-      //删除已完成的todo
-      deleteCompleteTodos () {
-        this.todos = this.todos.filter(todo => !todo.complete)
+    mounted () {
+      const url = 'https://api.github.com/search/repositories?q=v&sort=stars'
+      //使用vue-resource 发异步ajax请求获取数据
+      /*this.$http.get ('https://api.github.com/search/repositories?q=v&sort=stars')
+        .then(response => {
+          const result = reponse.data
+          this.mostRepo = result.items[0]
+          //更新数状态
+          this.repoName = mostRepo.name
+          this.repoUrl = mostRepo.html_url
 
-      },
-      //全选或全不选所有todo
-      selectAllTodos (isCheck) {
-        this.todos.forEach(todo => todo.complete = isCheck)
+        })
+        .catch (response => {
+          alert('请求出错。。。。')
+
+        })*/
+
+      //使用axios 发异步的ajax请求获取数据
+      /*axios.get (url)
+        .then(response => {
+          const result = reponse.data
+          this.mostRepo = result.items[0]
+          //更新数状态
+          this.repoName = mostRepo.name
+          this.repoUrl = mostRepo.html_url
+
+        })
+        .catch (response => {
+          alert('请求出错。。。。')
+
+        })*/
+
+      //用async  await
+      try {
+        const response = await axios.get(url)
+        const result = reponse.data
+        this.mostRepo = result.items[0]
+        //更新数状态
+        this.repoName = mostRepo.name
+        this.repoUrl = mostRepo.html_url
+      } catch (e) {
+        alert('请求出错。。。。')
       }
 
 
-    },
 
-    watch: {
-      todos: {
-        deep:true,  //深度监视
-        handler: function (value) {
-//          localStorage.setItem('todos_key',JSON.stringify(value))
-          storageUtils.saveTodos(value)
-        }
-      }
-    },
-
-    components:{
-      TodoHeader:Header,
-      TodoFooter:Footer,
-      TodoMain:Main
     }
-  }
 
+  }
 </script>
 
-<style scoped>
-  .todo-container {
-    width: 600px;
-    margin: 0 auto;
-  }
-  .todo-container .todo-wrap {
-    padding: 10px;
-    border: 1px solid #ddd;
-    border-radius: 5px;
-  }
+<style>
+
 </style>
